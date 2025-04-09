@@ -2,9 +2,9 @@ package br.com.fiap.game_vault.controller;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,20 +19,24 @@ import org.springframework.web.server.ResponseStatusException;
 
 import br.com.fiap.game_vault.model.Games;
 import br.com.fiap.game_vault.repository.GamesRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/games")
+@Slf4j
 public class GamesController {
-
-    private final Logger log = LoggerFactory.getLogger(getClass());
 
     @Autowired
     private GamesRepository repository;
 
     // listar todas os jogos
     // GET :8080/categories -> json
-    @GetMapping("/games")
+    @GetMapping
+    @Cacheable("/games")
+    @Operation(description = "Listar todos os jogos", tags = "games", summary = "Lista de jogos")
     public List<Games> index() { // mochy
         log.info("Buscando todos os Jogos");
         return repository.findAll();
@@ -40,9 +44,13 @@ public class GamesController {
 
     // cadastrando jogo
     @PostMapping
+    @CacheEvict(value = "games", allEntries = true)
     @ResponseStatus(HttpStatus.CREATED)
+     @Operation(responses = {
+            @ApiResponse(responseCode = "400", description = "Falha na validação")
+    })
     public Games create(@RequestBody @Valid Games game) {
-        log.info("Cadastrando Jogos " + game.getGame());
+        log.info("Cadastrando Jogo " + game.getGame());
         return repository.save(game);
     }
 
