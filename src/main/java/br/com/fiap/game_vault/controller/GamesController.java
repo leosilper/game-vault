@@ -35,7 +35,7 @@ public class GamesController {
     // listar todas os jogos
     // GET :8080/categories -> json
     @GetMapping
-    @Cacheable("/games")
+    @Cacheable("games")
     @Operation(description = "Listar todos os jogos", tags = "games", summary = "Lista de jogos")
     public List<Games> index() { // mochy
         log.info("Buscando todos os Jogos");
@@ -46,7 +46,7 @@ public class GamesController {
     @PostMapping
     @CacheEvict(value = "games", allEntries = true)
     @ResponseStatus(HttpStatus.CREATED)
-     @Operation(responses = {
+    @Operation(responses = {
             @ApiResponse(responseCode = "400", description = "Falha na validação")
     })
     public Games create(@RequestBody @Valid Games game) {
@@ -54,7 +54,7 @@ public class GamesController {
         return repository.save(game);
     }
 
-    // retornar uma categoria
+    // retornar um jogo
     @GetMapping("{id}")
     public Games get(@PathVariable Long id) {
         log.info("Buscando Jogos " + id);
