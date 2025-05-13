@@ -1,5 +1,6 @@
 package br.com.fiap.game_vault.controller;
 
+import br.com.fiap.game_vault.model.Games;
 import br.com.fiap.game_vault.model.WishList;
 import br.com.fiap.game_vault.model.WishListFilter;
 import br.com.fiap.game_vault.repository.WishListRepository;
@@ -25,6 +26,12 @@ public class WishListController {
     ) {
         var specification = WishListSpecification.withFilters(filter);
         return repository.findAll(specification, pageable);
+    }
+
+    @GetMapping("{id}")
+    public WishList get(@PathVariable Long id) {
+        log.info("Buscando Jogos na lista de desejos " + id);
+        return getWishList(id);
     }
 
     @PostMapping
